@@ -38,6 +38,7 @@ func main() {
 
 	// 创建Collector
 	collector := colly.NewCollector(
+		// 设置用户代理
 		colly.UserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36"),
 	)
 
@@ -58,8 +59,10 @@ func main() {
 
 	// 解析列表
 	collector.OnHTML("ol.grid_view", func(element *colly.HTMLElement) {
+		// 依次遍历所有的li节点
 		element.DOM.Find("li").Each(func(i int, selection *goquery.Selection) {
 			href, found := selection.Find("div.hd > a").Attr("href")
+			// 如果找到了详情页，则继续下一步的处理
 			if found {
 				parseDetail(collector, href, writer)
 				log.Println(href)
@@ -70,6 +73,7 @@ func main() {
 	// 查找下一页
 	collector.OnHTML("div.paginator > span.next", func(element *colly.HTMLElement) {
 		href, found := element.DOM.Find("a").Attr("href")
+		// 如果有下一页，则继续访问
 		if found {
 			element.Request.Visit(element.Request.AbsoluteURL(href))
 		}
